@@ -24,12 +24,6 @@ ISI FORM LOGIN
 ![image](https://github.com/user-attachments/assets/ab2f8bcd-4772-4750-89bc-240e6bd52d82)
 
 
-Tampilan Sesudah di Isi
-
-
-![image](https://github.com/user-attachments/assets/d5363d18-472f-45d1-967a-4f53a39dff52)
-
-
 b. Pop-Up Berhasil Login dengan Langsung Masuk ke dalam Page Produk 
 
 
