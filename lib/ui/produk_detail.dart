@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/bloc/produk_bloc.dart'; // Tambahan dari modul
 import 'package:tokokita/model/produk.dart';
 import 'package:tokokita/ui/produk_form.dart';
+import 'package:tokokita/ui/produk_page.dart'; // Tambahan dari modul
+import 'package:tokokita/widget/warning_dialog.dart'; // Tambahan dari modul
 
 class ProdukDetail extends StatefulWidget {
   Produk? produk;
@@ -124,7 +127,23 @@ class _ProdukDetailState extends State<ProdukDetail> {
             "Ya",
             style: TextStyle(color: Colors.red),
           ),
-          onPressed: () {},
+          onPressed: () {
+            ProdukBloc.deleteProduk(id: int.parse(widget.produk!.id!)) // Tambahan dari modul
+                .then(
+                  (value) => {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ProdukPage())) // Tambahan dari modul
+              },
+              onError: (error) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => const WarningDialog(
+                    description: "Hapus gagal, silahkan coba lagi", // Tambahan dari modul
+                  ),
+                );
+              },
+            );
+          },
         ),
         // Tombol batal
         OutlinedButton(

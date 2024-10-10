@@ -1,8 +1,8 @@
 class Produk {
-  int? id;
+  String? id;
   String? kodeProduk;
   String? namaProduk;
-  int? hargaProduk;
+  var hargaProduk;
 
   Produk({this.id, this.kodeProduk, this.namaProduk, this.hargaProduk});
 
@@ -11,7 +11,7 @@ class Produk {
       id: obj['id'],
       kodeProduk: obj['kode_produk'],
       namaProduk: obj['nama_produk'],
-      hargaProduk: obj['harga']
+      hargaProduk: obj['harga'],
     );
   }
 }

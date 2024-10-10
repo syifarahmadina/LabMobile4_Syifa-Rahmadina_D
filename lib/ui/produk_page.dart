@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/bloc/logout_bloc.dart';
+import 'package:tokokita/bloc/produk_bloc.dart';
 import 'package:tokokita/model/produk.dart';
+import 'package:tokokita/ui/login_page.dart';
 import 'package:tokokita/ui/produk_detail.dart';
 import 'package:tokokita/ui/produk_form.dart';
 
@@ -42,35 +45,54 @@ class _ProdukPageState extends State<ProdukPage> {
               ListTile(
                 title: const Text('Logout', style: TextStyle(color: Colors.black54)),
                 trailing: const Icon(Icons.logout, color: Colors.black54),
-                onTap: () async {},
+                onTap: () async {
+                  await LogoutBloc.logout().then((value) => {
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                            (route) => false)
+                  });
+                },
               ),
             ],
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(10),
-        children: [
-          ItemProduk(
-              produk: Produk(
-                  id: 1,
-                  kodeProduk: 'A001',
-                  namaProduk: 'Kamera',
-                  hargaProduk: 5000000)),
-          ItemProduk(
-              produk: Produk(
-                  id: 2,
-                  kodeProduk: 'A002',
-                  namaProduk: 'Kulkas',
-                  hargaProduk: 2500000)),
-          ItemProduk(
-              produk: Produk(
-                  id: 3,
-                  kodeProduk: 'A003',
-                  namaProduk: 'Mesin Cuci',
-                  hargaProduk: 2000000)),
-        ],
+      body: FutureBuilder<List<Produk>>(
+        future: ProdukBloc.getProduks(),
+        builder: (context, snapshot) {
+          // Debug snapshot status dan data
+          print('Snapshot connection state: ${snapshot.connectionState}');
+          print('Snapshot data: ${snapshot.data}');
+          print('Snapshot error: ${snapshot.error}');
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No products available'));
+          } else {
+            return ListProduk(list: snapshot.data);
+          }
+        },
       ),
+    );
+  }
+}
+
+class ListProduk extends StatelessWidget {
+  final List<Produk>? list;
+
+  const ListProduk({Key? key, this.list}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(10),
+      itemCount: list?.length ?? 0,
+      itemBuilder: (context, index) {
+        return ItemProduk(produk: list![index]);
+      },
     );
   }
 }
@@ -87,9 +109,7 @@ class ItemProduk extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProdukDetail(
-              produk: produk,
-            ),
+            builder: (context) => ProdukDetail(produk: produk),
           ),
         );
       },
@@ -103,14 +123,16 @@ class ItemProduk extends StatelessWidget {
         child: ListTile(
           contentPadding: const EdgeInsets.all(15),
           title: Text(
-            produk.namaProduk!,
+            produk.namaProduk ?? 'No Name',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.pink[800],
             ),
           ),
           subtitle: Text(
-            'Rp. ${produk.hargaProduk.toString()}',
+            produk.hargaProduk != null
+                ? 'Rp. ${produk.hargaProduk.toString()}'
+                : 'No Price',
             style: TextStyle(
               color: Colors.blue[700],
               fontWeight: FontWeight.w600,
